@@ -17,7 +17,7 @@
     // Minimum accel needed to trigger swing
     let minAccelSwing = 30;
     // New swing boolean
-    let newSwing = false;
+    // let newSwing = false;
 
     // Turn accel indicator on or off
     let testEnable = false;
@@ -76,13 +76,7 @@
                 test.textContent = `${maxX}`;
             }
         }
-        // If in the middle of a swing and acceleration falls below accel threshold, reset
-        if (newSwing && maxX < minAccelSwing) {
-            newSwing = false;
-            imgAxe.classList.remove('flash');
-        } 
-        // If not in the middle of a swing and acceleration passes threshold, trigger sounds/display changes
-        if (!newSwing && maxX > minAccelSwing) { 
+        if (maxX > minAccelSwing) { 
             newSwing = true;
             maxX = 0;
             // Remove listener immediately to not trigger multiple swings
@@ -94,9 +88,32 @@
             imgAxe.classList.add('flash');
             // Add listener back after timeout
             setTimeout(function(){
+                maxX = 0;
+                imgAxe.classList.remove('flash');
                 window.addEventListener('devicemotion', handleCombat);
             }, 100)
         }
+        // // If in the middle of a swing and acceleration falls below accel threshold, reset
+        // if (newSwing && maxX < minAccelSwing) {
+        //     newSwing = false;
+        //     imgAxe.classList.remove('flash');
+        // } 
+        // // If not in the middle of a swing and acceleration passes threshold, trigger sounds/display changes
+        // if (!newSwing && maxX > minAccelSwing) { 
+        //     newSwing = true;
+        //     maxX = 0;
+        //     // Remove listener immediately to not trigger multiple swings
+        //     window.removeEventListener('devicemotion', handleCombat);
+        //     // Choose random swing sound
+        //     const randInt = Math.floor(Math.random()*soundSwings.length)
+        //     new Audio(soundSwings[randInt]).play();
+        //     vibrate(200);
+        //     imgAxe.classList.add('flash');
+        //     // Add listener back after timeout
+        //     setTimeout(function(){
+        //         window.addEventListener('devicemotion', handleCombat);
+        //     }, 100)
+        // }
     }
 
     function handleDisclaimer(e) {
