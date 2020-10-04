@@ -35,6 +35,20 @@
     const textAccel = document.querySelector('#results .accel');
     const reset = document.querySelector('#reset');
 
+    async function motionAllowed() {
+        if (window.DeviceMotionEvent) {
+            // Check if iOS 13+
+            if (typeof window.DeviceMotionEvent.requestPermission === 'function') {
+                const permission = await window.DeviceMotionEvent.requestPermission();
+                return permission === 'granted' ? true : false;
+            } else {
+                // non-iOS 13+ devices
+                return true;
+            }
+        }
+        return false;
+    }
+
     function vibrate(ms) {
         if ('vibrate' in window.navigator) {
             window.navigator.vibrate(ms);
@@ -117,12 +131,18 @@
     }
 
     function handleDisclaimer(e) {
-        disclaimer.classList.add('hide');
-        modeChange.classList.remove('hide');
-        start.classList.remove('hide');
-        window.addEventListener('devicemotion', handleThrow);
-        new Audio(soundStart).play();
-        vibrate(200);
+        if (motionAllowed()) {
+            window.addEventListener('devicemotion', handleThrow);
+            buttonMode.addEventListener('click', handleModeChange);
+            reset.addEventListener('click', handleReset);
+            disclaimer.classList.add('hide');
+            modeChange.classList.remove('hide');
+            start.classList.remove('hide');
+            new Audio(soundStart).play();
+            vibrate(200);
+        } else {
+            alert('Your device does not support this app')
+        }
     }
 
     function handleResetEnd(e) {
@@ -164,38 +184,6 @@
         new Audio(soundStart).play();
         vibrate(200);
     }
-    buttonMode.addEventListener('click', handleModeChange)
 
-    async function iOSallowed() {
-        if (window.DeviceMotionEvent && window.DeviceMotionEvent.requestPermission) {
-            const permission = await window.DeviceMotionEvent.requestPermission();
-            return permission === 'granted' ? true : false;
-        } 
-        return false;
-    }
-
-
-    async function init() {
-        if (window.DeviceMotionEvent) {
-            // Check if iOS 13+
-            if (typeof window.DeviceMotionEvent.requestPermission === 'function') {
-                const permission = await window.DeviceMotionEvent.requestPermission();
-                if (permission === 'granted') {
-                    buttonDisclaimer.addEventListener('click', handleDisclaimer);
-                    reset.addEventListener('click', handleReset);
-                } else {
-                    alert('Your device does not support this app')
-                }
-            } else {
-                // non-iOS 13+ devices
-                buttonDisclaimer.addEventListener('click', handleDisclaimer);
-                reset.addEventListener('click', handleReset);
-            }
-        } else {
-            alert('Your device does not support this app')
-        }
-    }
-    
-    init();
-
+    buttonDisclaimer.addEventListener('click', handleDisclaimer);
 })();
